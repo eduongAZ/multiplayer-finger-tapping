@@ -1,5 +1,7 @@
 from server import Server
+from config import SERVER_ADDR
 
 
 if __name__ == "__main__":
-    print("Hello world!")
+    server = Server(SERVER_ADDR, 6060)
+    server.run()

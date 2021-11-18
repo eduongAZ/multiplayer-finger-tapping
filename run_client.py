@@ -1,5 +1,7 @@
 from client import Client
+from config import SERVER_ADDR
 
 
 if __name__ == "__main__":
-    print("Hello world!")
+    client = Client(SERVER_ADDR, 6060)
+    client.run()

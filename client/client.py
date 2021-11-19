@@ -44,7 +44,7 @@ class Client:
         self._to_server.close()
 
     def _update_state(self):
-        screen = pygame.display.set_mode((100, 100))
+        screen = pygame.display.set_mode((200, 200))
         while self._running:
             data = receive([self._from_server])
             print(data)
@@ -52,7 +52,7 @@ class Client:
             screen.fill((0, 0, 0))
 
             font = pygame.font.Font(None, 74)
-            text = font.render("yes", 1, (255, 255, 255))
+            text = font.render(self._client_name, 1, (255, 255, 255))
             screen.blit(text, (10, 10))
 
             pygame.display.flip()

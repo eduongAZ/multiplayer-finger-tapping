@@ -22,13 +22,15 @@ class Client:
 
         print("Connected to server")
 
+        self._state = None
+
         self._running = False
 
     def run(self):
         self._running = True
 
         # Create a thread for updating the state of the game
-        state_thread = threading.Thread(target=self._update_state, daemon=True)
+        state_thread = threading.Thread(target=self._from_server_handle, daemon=True)
         state_thread.start()
 
         # Create a thread for controlling client from terminal
@@ -43,11 +45,14 @@ class Client:
         self._from_server.close()
         self._to_server.close()
 
-    def _update_state(self):
+    def _from_server_handle(self):
         screen = pygame.display.set_mode((200, 200))
         while self._running:
-            data = receive([self._from_server])
-            print(data)
+            [data] = receive([self._from_server])
+            if data["type"] == "state":
+                self._state = data["state"]
+
+            print(self._state)
 
             screen.fill((0, 0, 0))
 
@@ -72,15 +77,22 @@ class Client:
             # Get keys pressed by user
             keys = pygame.key.get_pressed()
 
-            data = {}
-            data["type"] = "command"
-            data["sender"] = self._client_name
+            data = None
 
-            if keys[pygame.K_SPACE]:
-                data["command"] = "tap"
-            else:
-                data["command"] = "untap"
+            if self._state is not None:
+                if keys[pygame.K_SPACE]:
+                    if self._state[self._client_name] == 0:
+                        data = {}
+                        data["type"] = "command"
+                        data["sender"] = self._client_name
+                        data["command"] = "tap"
+                elif self._state[self._client_name] == 1:
+                    data = {}
+                    data["type"] = "command"
+                    data["sender"] = self._client_name
+                    data["command"] = "untap"
 
-            send([self._to_server], data)
+            if data is not None:
+                send([self._to_server], data)
 
             clock.tick(UPDATE_RATE)

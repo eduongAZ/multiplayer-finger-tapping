@@ -33,11 +33,10 @@ class Client:
         client_input_thread = threading.Thread(target=self._client_input_handle, daemon=True)
         client_input_thread.start()
 
-        screen = pygame.display.set_mode((200, 200))
+        screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         while self._running:
             pygame.event.get()
 
-            # Get game events
             data = receive([self._from_server], 0.0)
             if not data:
                 continue

@@ -29,23 +29,10 @@ class Client:
     def run(self):
         self._running = True
 
-        # Create a thread for updating the state of the game
-        state_thread = threading.Thread(target=self._from_server_handle, daemon=True)
-        state_thread.start()
-
         # Create a thread for controlling client from terminal
-        command_thread = threading.Thread(target=self._process_input, daemon=True)
-        command_thread.start()
+        client_input_thread = threading.Thread(target=self._process_client_input, daemon=True)
+        client_input_thread.start()
 
-        # Wait for threads to finish
-        state_thread.join()
-        command_thread.join()
-
-        # Close server connection
-        self._from_server.close()
-        self._to_server.close()
-
-    def _from_server_handle(self):
         screen = pygame.display.set_mode((200, 200))
         while self._running:
             [data] = receive([self._from_server])
@@ -62,17 +49,21 @@ class Client:
 
             pygame.display.flip()
 
-    def _process_input(self):
+        # Wait for threads to finish
+        client_input_thread.join()
+
+        # Close server connection
+        self._from_server.close()
+        self._to_server.close()
+
+    def _process_client_input(self):
         """
         Send user's input command to server
         """
         clock = pygame.time.Clock()
         while self._running:
-            # Exit the game if user hits close
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self._running = False
-                    break
+            # Get game events
+            pygame.event.get()
 
             # Get keys pressed by user
             keys = pygame.key.get_pressed()
@@ -93,6 +84,6 @@ class Client:
                     data["command"] = "untap"
 
             if data is not None:
-                send([self._to_server], data)
+                send([self._to_server], data, wait_time=0.0)
 
             clock.tick(UPDATE_RATE)

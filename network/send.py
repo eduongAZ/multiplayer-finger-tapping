@@ -11,11 +11,12 @@ def send(receivers: list, payload, wait_time: Optional[float] = None) -> None:
     if exceptional:
         raise RuntimeError("Connection lost")
 
-    # Convert payload into json string and encode it
-    payload_msg = json.dumps(payload).encode('utf-8')
+    if receivers:
+        # Convert payload into json string and encode it
+        payload_msg = json.dumps(payload).encode('utf-8')
 
-    # Pad the json string to specific data length
-    payload_msg += b' ' * (HEADER - len(payload_msg))
+        # Pad the json string to specific data length
+        payload_msg += b' ' * (HEADER - len(payload_msg))
 
-    for connection in receivers:
-        connection.send(payload_msg)
+        for connection in receivers:
+            connection.send(payload_msg)

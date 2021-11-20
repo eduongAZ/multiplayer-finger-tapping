@@ -30,7 +30,7 @@ class Client:
         self._running = True
 
         # Create a thread for controlling client from terminal
-        client_input_thread = threading.Thread(target=self._process_client_input, daemon=True)
+        client_input_thread = threading.Thread(target=self._client_input_handle, daemon=True)
         client_input_thread.start()
 
         screen = pygame.display.set_mode((200, 200))
@@ -56,7 +56,7 @@ class Client:
         self._from_server.close()
         self._to_server.close()
 
-    def _process_client_input(self):
+    def _client_input_handle(self):
         """
         Send user's input command to server
         """

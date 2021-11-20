@@ -38,6 +38,8 @@ class Client:
 
         win_width, win_height = pygame.display.get_surface().get_size()
         main_player_coordinate = ((win_width - BOX_WIDTH) / 2, (win_height / 2) - BOX_WIDTH - 1)
+        other_player_height = (win_height / 2) + 1
+        other_player_width_offset = (BOX_WIDTH / 2) + 1
 
         while self._running:
             pygame.event.get()
@@ -51,6 +53,9 @@ class Client:
             if data["type"] == "state":
                 self._state = data["state"]
 
+            num_other_players = len(self._state) - 1
+            counter = 0
+
             # Add sprites to sprite group
             all_sprites_list = pygame.sprite.Group()
             for name, state in self._state.items():
@@ -58,6 +63,20 @@ class Client:
                     color = (255, 0, 255) if state else (100, 0, 100)
                     subject = PlayerSquare(main_player_coordinate, color)
                     all_sprites_list.add(subject)
+                else:
+                    if num_other_players == 1:
+                        color = (255, 255, 255) if state else (100, 100, 100)
+                        subject = PlayerSquare((main_player_coordinate[0], other_player_height), color)
+                        all_sprites_list.add(subject)
+                    elif counter == 0:
+                        color = (255, 255, 255) if state else (100, 100, 100)
+                        subject = PlayerSquare((main_player_coordinate[0] - other_player_width_offset, other_player_height), color)
+                        all_sprites_list.add(subject)
+                        counter += 1
+                    else:
+                        color = (255, 255, 255) if state else (100, 100, 100)
+                        subject = PlayerSquare((main_player_coordinate[0] + other_player_width_offset, other_player_height), color)
+                        all_sprites_list.add(subject)
 
             screen.fill((0, 0, 0))
 

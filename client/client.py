@@ -2,7 +2,8 @@ import socket
 import threading
 
 import pygame
-from config import UPDATE_RATE
+from common import PlayerSquare
+from config import BOX_WIDTH, UPDATE_RATE
 from network import receive, send
 
 
@@ -34,6 +35,10 @@ class Client:
         client_input_thread.start()
 
         screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+
+        win_width, win_height = pygame.display.get_surface().get_size()
+        main_player_coordinate = ((win_width - BOX_WIDTH) / 2, (win_height / 2) - BOX_WIDTH - 1)
+
         while self._running:
             pygame.event.get()
 
@@ -46,13 +51,18 @@ class Client:
             if data["type"] == "state":
                 self._state = data["state"]
 
-            print(self._state)
+            # Add sprites to sprite group
+            all_sprites_list = pygame.sprite.Group()
+            for name, state in self._state.items():
+                if name == self._client_name:
+                    color = (255, 0, 255) if state else (100, 0, 100)
+                    subject = PlayerSquare(main_player_coordinate, color)
+                    all_sprites_list.add(subject)
 
             screen.fill((0, 0, 0))
 
-            font = pygame.font.Font(None, 74)
-            text = font.render(self._client_name, 1, (255, 255, 255))
-            screen.blit(text, (10, 10))
+            # Draw sprite group
+            all_sprites_list.draw(screen)
 
             pygame.display.flip()
 

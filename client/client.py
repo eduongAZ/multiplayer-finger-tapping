@@ -41,8 +41,9 @@ class Client:
             data = receive([self._from_server], 0.0)
             if not data:
                 continue
+            else:
+                [data] = data
 
-            data = data[0]
             if data["type"] == "state":
                 self._state = data["state"]
 

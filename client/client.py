@@ -35,7 +35,14 @@ class Client:
 
         screen = pygame.display.set_mode((200, 200))
         while self._running:
-            [data] = receive([self._from_server])
+            pygame.event.get()
+
+            # Get game events
+            data = receive([self._from_server], 0.0)
+            if not data:
+                continue
+
+            data = data[0]
             if data["type"] == "state":
                 self._state = data["state"]
 
@@ -62,9 +69,6 @@ class Client:
         """
         clock = pygame.time.Clock()
         while self._running:
-            # Get game events
-            pygame.event.get()
-
             # Get keys pressed by user
             keys = pygame.key.get_pressed()
 

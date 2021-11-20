@@ -63,20 +63,19 @@ class Client:
                     color = (255, 0, 255) if state else (100, 0, 100)
                     subject = PlayerSquare(main_player_coordinate, color)
                     all_sprites_list.add(subject)
+                elif num_other_players == 1:
+                    color = (255, 255, 255) if state else (100, 100, 100)
+                    subject = PlayerSquare((main_player_coordinate[0], other_player_height), color)
+                    all_sprites_list.add(subject)
+                elif counter == 0:
+                    color = (255, 255, 255) if state else (100, 100, 100)
+                    subject = PlayerSquare((main_player_coordinate[0] - other_player_width_offset, other_player_height), color)
+                    all_sprites_list.add(subject)
+                    counter += 1
                 else:
-                    if num_other_players == 1:
-                        color = (255, 255, 255) if state else (100, 100, 100)
-                        subject = PlayerSquare((main_player_coordinate[0], other_player_height), color)
-                        all_sprites_list.add(subject)
-                    elif counter == 0:
-                        color = (255, 255, 255) if state else (100, 100, 100)
-                        subject = PlayerSquare((main_player_coordinate[0] - other_player_width_offset, other_player_height), color)
-                        all_sprites_list.add(subject)
-                        counter += 1
-                    else:
-                        color = (255, 255, 255) if state else (100, 100, 100)
-                        subject = PlayerSquare((main_player_coordinate[0] + other_player_width_offset, other_player_height), color)
-                        all_sprites_list.add(subject)
+                    color = (255, 255, 255) if state else (100, 100, 100)
+                    subject = PlayerSquare((main_player_coordinate[0] + other_player_width_offset, other_player_height), color)
+                    all_sprites_list.add(subject)
 
             screen.fill((0, 0, 0))
 

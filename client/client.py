@@ -53,6 +53,8 @@ class Client:
             if data["type"] == "state":
                 self._state = data["state"]
 
+            print(data)
+
             num_other_players = len(self._state) - 1
             counter = 0
 

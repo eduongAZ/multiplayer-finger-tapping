@@ -2,7 +2,8 @@ import socket
 import threading
 from select import select
 
-from config import UPDATE_RATE
+from config import (SECONDS_COUNT_DOWN, SECONDS_PER_SESSION, SESSION,
+                    UPDATE_RATE)
 from network import receive, send
 from pygame import time
 
@@ -22,6 +23,8 @@ class Server:
         self._from_client_request.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Reuse socket
         self._from_client_request.bind((host, port + 1))
         self._from_client_request.setblocking(False)
+
+        print(f"Address: {host}, {port}")
 
         self._to_client_connections = []
         self._from_client_connections = {}
@@ -47,7 +50,7 @@ class Server:
         from_client_commands_thread = threading.Thread(target=self._from_client_commands, daemon=True)
         from_client_commands_thread.start()
 
-        print("Server started.")
+        print("Server started")
 
         # Wait for threads to finish
         to_client_request_thread.join()
@@ -106,11 +109,32 @@ class Server:
         data = {}
         data["type"] = "state"
 
+        current_session_index = -1
+        counter_target = SECONDS_COUNT_DOWN
+
+        start_ticks = time.get_ticks()
+
+        seconds = 0.0
+
         clock = time.Clock()
         while self._running:
+            if seconds >= counter_target:
+                current_session_index += 1
+
+                if current_session_index >= len(SESSION):
+                    self._running = False
+                    break
+
+                counter_target = SECONDS_PER_SESSION[current_session_index]
+                start_ticks = time.get_ticks()
+
             if self._to_client_connections:
                 data["state"] = self._state
+                data["reveal"] = 1 if current_session_index < 0 else SESSION[current_session_index]
+                data["seconds"] = counter_target - int(seconds)
                 send(self._to_client_connections, data)
+
+            seconds = (time.get_ticks() - start_ticks) / 1000.0
 
             clock.tick(UPDATE_RATE)
 

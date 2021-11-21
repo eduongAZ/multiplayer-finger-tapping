@@ -131,7 +131,10 @@ class Server:
             if self._to_client_connections:
                 data["state"] = self._state
                 data["reveal"] = 1 if current_session_index < 0 else SESSION[current_session_index]
-                data["seconds"] = counter_target - int(seconds)
+
+                seconds_to_send = int(counter_target) - int(seconds)
+                data["seconds"] = 1 if seconds_to_send == 0 else seconds_to_send
+
                 send(self._to_client_connections, data)
 
             seconds = (time.get_ticks() - start_ticks) / 1000.0

@@ -86,6 +86,12 @@ class Client:
             # Draw sprite group
             all_sprites_list.draw(screen)
 
+            # Display timer
+            font = pygame.font.Font(None, 74)
+            text = font.render(str(data["seconds"]), 1, (255, 255, 255))
+            text_rect = text.get_rect(center=((win_width / 2), main_player_coordinate[1] - 25))
+            screen.blit(text, text_rect)
+
             pygame.display.flip()
 
         # Wait for threads to finish
